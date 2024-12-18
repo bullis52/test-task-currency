@@ -1,79 +1,116 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Currency Exchange App
 
-# Getting Started
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Technical Description
 
-## Step 1: Start the Metro Server
+### App Architecture and Design Choices
+The app follows a modular structure using **Redux Toolkit** for state management and **Redux Persist** for offline data persistence.
+- **Redux Toolkit** provides centralized state management for exchange rates, favorites, and loading/error states.
+- **Redux Persist** ensures that state (favorites and exchange rates) is retained across app restarts, enabling offline mode.
+- **AsyncStorage** is used as the storage layer for caching.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+The design follows separation of concerns:
+1. **API layer**: Handles API communication.
+2. **State layer**: Manages global state using Redux Toolkit.
+3. **UI layer**: Screens and components handle rendering and user interaction.
 
-To start Metro, run the following command from the _root_ of your React Native project:
+---
 
-```bash
-# using npm
-npm start
+### App Structure and Major Components
 
-# OR using Yarn
-yarn start
+```
+CurrencyExchangeApp/
+│
+├── src/
+│   ├── api/
+│   │   └── currencyApi.ts       # API logic for fetching exchange rates
+│   │
+│   ├── store/
+│   │   ├── currencySlice.ts     # Redux slice for managing state
+│   │   ├── hooks.ts             # Custom hooks for dispatch and selectors
+│   │   └── store.ts             # Store configuration with Redux Persist
+│   │
+│   ├── components/
+│   │   ├── Header.tsx           # Reusable Header component
+│   │   └── ExchangeRateItem.tsx # Component for rendering a single currency rate
+│   │
+│   ├── screens/
+│   │   └── CurrencyExchangeScreen.tsx # Main screen displaying rates and favorites
+│   │
+│   └── App.tsx                  # Root of the app with Redux and PersistGate setup
+│
+├── .env                         # Environment variables for API key and URL
+└── README.md                    # Documentation
 ```
 
-## Step 2: Start your Application
+**Major Components:**
+1. `Header.tsx`: Displays the app title.
+2. `ExchangeRateItem.tsx`: Renders an exchange rate with a toggle for favorites.
+3. `CurrencyExchangeScreen.tsx`: Main screen that fetches and displays exchange rates using Redux state.
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+---
 
-### For Android
+### Offline Mode Implementation
+Offline support is implemented using:
+1. **Redux Persist**: Automatically saves and restores the Redux state.
+   - Cached data is saved in `AsyncStorage` and rehydrated when the app is restarted.
+2. **Error Handling with Fallback**:
+   - If an API request fails, the app loads cached exchange rates from `AsyncStorage`.
 
-```bash
-# using npm
-npm run android
+**Flow:**
+- On successful API fetch, exchange rates are cached in the Redux state.
+- If offline, Redux Persist loads the last saved state, ensuring data availability.
 
-# OR using Yarn
-yarn android
-```
+---
 
-### For iOS
+### Additional Features and Libraries
+1. **React Native + TypeScript**: Ensures type safety and clean code structure.
+2. **Redux Toolkit**: Simplifies state management.
+3. **Redux Persist**: Enables offline persistence.
+4. **Axios**: Used for API calls.
+5. **AsyncStorage**: Storage layer for Redux Persist.
+6. **Environment Variables**: API keys and URLs are stored in a `.env` file, keeping sensitive data secure.
 
-```bash
-# using npm
-npm run ios
+---
 
-# OR using Yarn
-yarn ios
-```
+## Additional Considerations
+1. **Error Handling**: Displays alerts when an API request fails.
+2. **Code Maintainability**: The app follows modular structure and best practices.
+3. **Environment Configuration**: Sensitive keys are kept in `.env` for security.
+4. **Scalability**: New features (e.g., filtering, sorting) can be added easily due to the modular design.
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+---
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+## How to Run the App
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-repo-url.git
+   cd CurrencyExchangeApp
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Add your API key in the `.env` file:
+   ```plaintext
+   API_URL=https://api.coinlayer.com/api/live
+   API_KEY=YOUR_API_KEY
+   ```
+4. Run the app:
+   - For iOS:
+     ```bash
+     npx react-native run-ios
+     ```
+   - For Android:
+     ```bash
+     npx react-native run-android
+     ```
 
-## Step 3: Modifying your App
+---
 
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## Notes
+- Ensure the API key is valid and accessible.
+- Restart Metro Bundler with `--reset-cache` if environment variables are not picked up:
+   ```bash
+   npm start --reset-cache
+   ```
